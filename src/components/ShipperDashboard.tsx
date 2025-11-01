@@ -15,6 +15,7 @@ import { OrderSuccessModal } from './OrderSuccessModal';
 import { ShipperOrdersModal } from './ShipperOrdersModal';
 import { Button } from './ui/button';
 import { ClipboardList } from 'lucide-react';
+import { Alert, AlertDescription } from './ui/alert';
 
 /**
  * Интерфейс пользователя системы
@@ -51,11 +52,13 @@ interface Order {
   length: string;                 // Длина груза
   width: string;                  // Ширина груза
   height: string;                 // Высота груза
+  vehicleCount?: number;          // Количество необходимого транспорта
 }
 
 interface OrderWithStatus extends Order {
   id: string;
   status: string;
+  assignedDriverId: string | null; // ID назначенного водителя
 }
 
 interface ShipperDashboardProps {
@@ -71,6 +74,8 @@ export function ShipperDashboard({ onAddOrder, currentUser, orders, onDeleteOrde
   const [isOrdersModalOpen, setIsOrdersModalOpen] = useState(false);
   const [pendingOrder, setPendingOrder] = useState<Order | null>(null);
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
+  const [error, setError] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
 
   /**
    * Обработчик отправки формы заказа
@@ -79,14 +84,37 @@ export function ShipperDashboard({ onAddOrder, currentUser, orders, onDeleteOrde
   const handleOrderSubmit = (order: Order) => {
     setPendingOrder(order);
     setIsConfirmationOpen(true);
+    setError(''); // Очищаем предыдущие ошибки
   };
 
   /**
    * Подтверждение создания заказа
-   * Создает заказ(ы) и показывает уведомление об успехе
+   * Отправляет данные на бэкенд, затем создает заказ(ы) и показывает уведомление об успехе
    */
-  const handleConfirmOrder = () => {
-    if (pendingOrder) {
+  const handleConfirmOrder = async () => {
+    if (!pendingOrder) return;
+
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:3001/api/orders/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(pendingOrder)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(result.message || 'Ошибка при создании заказа');
+        setIsLoading(false);
+        return;
+      }
+
+      // После успешного создания на бэкенде добавляем заказ в локальное состояние
       onAddOrder(pendingOrder);
       const vehicleCount = pendingOrder.vehicleCount || 1;
       // Формируем сообщение о созданных заказах
@@ -97,6 +125,10 @@ export function ShipperDashboard({ onAddOrder, currentUser, orders, onDeleteOrde
       setIsConfirmationOpen(false);
       setIsSuccessOpen(true);
       setPendingOrder(null);
+      setIsLoading(false);
+    } catch (err) {
+      setError('Ошибка соединения с сервером');
+      setIsLoading(false);
     }
   };
 
@@ -142,14 +174,30 @@ export function ShipperDashboard({ onAddOrder, currentUser, orders, onDeleteOrde
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
           <OrderForm onSubmit={handleOrderSubmit} currentUser={currentUser} />
+          {isLoading && (
+            <div className="mt-4 text-center text-sm text-muted-foreground">
+              Отправка данных на сервер...
+            </div>
+          )}
         </CardContent>
       </Card>
 
       <OrderConfirmationModal
         isOpen={isConfirmationOpen}
-        onClose={() => setIsConfirmationOpen(false)}
-        orderData={pendingOrder}
+        onClose={() => {
+          setIsConfirmationOpen(false);
+          setError('');
+        }}
+        orderData={pendingOrder ? {
+          ...pendingOrder,
+          vehicleCount: pendingOrder.vehicleCount ?? 1
+        } : null}
         onConfirm={handleConfirmOrder}
       />
 

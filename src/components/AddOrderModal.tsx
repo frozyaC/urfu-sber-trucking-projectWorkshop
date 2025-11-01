@@ -4,9 +4,10 @@
  * Позволяет логисту вручную создавать новые заказы через форму OrderForm
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { OrderForm } from './OrderForm';
+import { Alert, AlertDescription } from './ui/alert';
 
 /**
  * Интерфейс заказа для создания логистом
@@ -49,12 +50,41 @@ interface AddOrderModalProps {
  * Модальное окно для добавления нового заказа логистом
  */
 export function AddOrderModal({ isOpen, onClose, onAddOrder }: AddOrderModalProps) {
+  const [error, setError] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
+
   /**
    * Обработчик отправки формы заказа
+   * Отправляет данные на бэкенд перед вызовом onAddOrder
    */
-  const handleSubmit = (order: Order) => {
-    onAddOrder(order);
-    onClose();
+  const handleSubmit = async (order: Order) => {
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:3001/api/orders/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(order)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(result.message || 'Ошибка при создании заказа');
+        setIsLoading(false);
+        return;
+      }
+
+      // После успешного создания на бэкенде вызываем callback
+      onAddOrder(order);
+      onClose();
+    } catch (err) {
+      setError('Ошибка соединения с сервером');
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -66,6 +96,11 @@ export function AddOrderModal({ isOpen, onClose, onAddOrder }: AddOrderModalProp
             Заполните детали заказа на перевозку. Все поля, отмеченные звездочкой (*), обязательны для заполнения.
           </DialogDescription>
         </DialogHeader>
+        {error && (
+          <Alert variant="destructive" className="mt-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
         <div className="mt-6">
           <OrderForm 
             onSubmit={handleSubmit}
@@ -78,6 +113,11 @@ export function AddOrderModal({ isOpen, onClose, onAddOrder }: AddOrderModalProp
             isLogistician={true}
           />
         </div>
+        {isLoading && (
+          <div className="mt-4 text-center text-sm text-muted-foreground">
+            Отправка данных на сервер...
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

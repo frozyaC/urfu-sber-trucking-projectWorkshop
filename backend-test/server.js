@@ -69,4 +69,76 @@ app.post('/api/auth/register', (req, res) => {
   res.json(newUser);
 });
 
+// POST /api/orders/create
+app.post('/api/orders/create', (req, res) => {
+  console.log(`\n[ORDER CREATE] Попытка создания заказа:`, req.body);
+
+  // Валидация обязательных полей
+  const requiredFields = [
+    'shipperName',
+    'managerName',
+    'origin',
+    'destination',
+    'pickupDate',
+    'deliveryDate',
+    'transportationCost',
+    'vehicleCount'
+  ];
+
+  const missingFields = requiredFields.filter(field => !req.body[field]);
+  if (missingFields.length > 0) {
+    console.log(`[ORDER CREATE] Ошибка валидации: отсутствуют поля ${missingFields.join(', ')}`);
+    return res.status(400).json({ 
+      message: `Заполните все обязательные поля: ${missingFields.join(', ')}` 
+    });
+  }
+
+  // Валидация типов данных
+  const cost = parseFloat(req.body.transportationCost);
+  const vehicleCount = parseInt(req.body.vehicleCount);
+
+  if (isNaN(cost) || cost <= 0) {
+    console.log(`[ORDER CREATE] Ошибка валидации: некорректная стоимость`);
+    return res.status(400).json({ message: 'Стоимость должна быть положительным числом' });
+  }
+
+  if (isNaN(vehicleCount) || vehicleCount < 1 || vehicleCount > 5) {
+    console.log(`[ORDER CREATE] Ошибка валидации: некорректное количество транспорта`);
+    return res.status(400).json({ message: 'Количество транспорта должно быть от 1 до 5' });
+  }
+
+  // Создание объекта заказа
+  const order = {
+    id: Date.now().toString(), // Простой ID на основе времени
+    shipperName: req.body.shipperName,
+    managerName: req.body.managerName,
+    origin: req.body.origin,
+    destination: req.body.destination,
+    originLatitude: req.body.originLatitude || null,
+    originLongitude: req.body.originLongitude || null,
+    destinationLatitude: req.body.destinationLatitude || null,
+    destinationLongitude: req.body.destinationLongitude || null,
+    trailerType: req.body.trailerType || 'Самосвал',
+    volume: req.body.volume || null,
+    weight: req.body.weight || null,
+    pickupDate: req.body.pickupDate,
+    pickupTime: req.body.pickupTime || null,
+    deliveryDate: req.body.deliveryDate,
+    deliveryTime: req.body.deliveryTime || null,
+    cargoType: req.body.cargoType || null,
+    specialRequirements: req.body.specialRequirements || '',
+    transportationCost: cost,
+    length: req.body.length || null,
+    width: req.body.width || null,
+    height: req.body.height || null,
+    vehicleCount: vehicleCount,
+    externalOrderNumber: req.body.externalOrderNumber || null,
+    createdAt: new Date().toISOString(),
+    status: 'pending' // Статус заказа по умолчанию
+  };
+
+  console.log(`[ORDER CREATE] Успешное создание заказа ID: ${order.id}`);
+  res.status(201).json({ order });
+});
+
 app.listen(3001, () => console.log('\nMock backend listening on port 3001\n'));
