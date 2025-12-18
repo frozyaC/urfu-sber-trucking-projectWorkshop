@@ -21,6 +21,7 @@ import java.util.Optional;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @CrossOrigin(origins = {
+        "http://193.108.114.95",
         "http://localhost:3003",
         "http://localhost:3001"
 }, maxAge = 3600)
