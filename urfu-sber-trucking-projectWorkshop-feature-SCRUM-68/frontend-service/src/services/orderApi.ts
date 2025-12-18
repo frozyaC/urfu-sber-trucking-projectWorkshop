@@ -1,4 +1,5 @@
-const DEFAULT_API_BASE = 'http://localhost:8080';
+// Empty default means "same origin" (frontend served behind gateway at /api)
+const DEFAULT_API_BASE = '';
 
 // Access env safely to avoid TS typing issues when vite/client types aren't present
 const VITE_ENV: any = (import.meta as any)?.env ?? {};

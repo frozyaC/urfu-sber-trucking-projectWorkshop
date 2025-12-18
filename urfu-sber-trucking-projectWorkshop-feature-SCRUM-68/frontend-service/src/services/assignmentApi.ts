@@ -9,7 +9,8 @@ export interface AssignResponse {
   error?: string;
 }
 
-const BASE_URL = 'http://localhost:8080';
+// Same-origin backend behind gateway
+const BASE_URL = '';
 
 export async function assignCalculatedDriver(body: AssignRequestBody): Promise<AssignResponse> {
   try {

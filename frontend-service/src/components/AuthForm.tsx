@@ -159,8 +159,8 @@ export function AuthForm({ onLogin }: AuthFormProps) {
     }
 
     const url = isLogin
-      ? 'http://localhost:8080/api/auth/login'
-      : 'http://localhost:8080/api/auth/register';
+      ? '/api/auth/login'
+      : '/api/auth/register';
 
     try {
       const response = await fetch(url, {

@@ -2,7 +2,8 @@
  * API для работы с водителями, транспортными средствами, прицепами и связками
  */
 
-const DEFAULT_API_BASE = 'http://localhost:8080';
+// Same-origin by default (gateway exposes backend under /api)
+const DEFAULT_API_BASE = '';
 const VITE_ENV: any = (import.meta as any)?.env ?? {};
 const API_BASE_URL = (VITE_ENV.VITE_API_BASE_URL || DEFAULT_API_BASE).replace(/\/$/, '');
 
