@@ -4,6 +4,7 @@ services:
   postgres:
     image: postgres:16-alpine
     container_name: postgres
+    restart: unless-stopped
     environment:
       POSTGRES_DB: appdb
       POSTGRES_USER: appuser
@@ -23,6 +24,7 @@ services:
   wiremock:
     image: wiremock/wiremock:3.9.1
     container_name: wiremock_trucking
+    restart: unless-stopped
     networks:
       - app-network
     ports:
@@ -38,6 +40,7 @@ services:
       context: ./api-gateway-service
       dockerfile: Dockerfile
     container_name: api-gateway-service
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
@@ -65,6 +68,7 @@ services:
       context: ./auth-trucking-service
       dockerfile: Dockerfile
     container_name: auth-trucking-service
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
@@ -92,6 +96,7 @@ services:
       context: ./daily-status-update-service
       dockerfile: Dockerfile
     container_name: daily-status-update-service
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
@@ -119,6 +124,7 @@ services:
       context: ./match-service
       dockerfile: Dockerfile
     container_name: match-service
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
@@ -146,6 +152,7 @@ services:
       context: ./simple-auth-trucking-service
       dockerfile: Dockerfile
     container_name: simple-auth-trucking-service
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
@@ -173,6 +180,7 @@ services:
       context: ./frontend-service
       dockerfile: Dockerfile
     container_name: frontend-service
+    restart: unless-stopped
     depends_on:
       - api-gateway-service
     ports:
@@ -189,6 +197,7 @@ services:
   nginx-gateway:
     image: nginx:alpine
     container_name: nginx-gateway
+    restart: unless-stopped
     depends_on:
       - frontend-service
       - api-gateway-service

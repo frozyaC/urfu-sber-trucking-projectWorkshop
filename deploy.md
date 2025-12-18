@@ -8,9 +8,9 @@ Goal: run the whole stack on a fresh VPS and make it reachable from the internet
 - One-command updates: pull code, rebuild, restart.
 
 ## Prerequisites
-- VPS: Ubuntu 24.04 LTS (ENG), public IPv4, recommended 2 vCPU / 4 GB RAM.
+- VPS: Ubuntu 24.04 LTS (ENG), public IPv4: **193.108.114.95**, recommended 2 vCPU / 4 GB RAM.
 - User: you can SSH as a sudo-capable user.
-- Domain (recommended for HTTPS): e.g., `app.example.com` pointing to the VPS public IP via an A record.
+- Domain (recommended for HTTPS): e.g., `app.example.com` pointing to **193.108.114.95** via an A record.
 - Firewall: plan to open inbound TCP 80 (HTTP) and 443 (HTTPS if used). Do **not** expose DB or internal service ports.
 
 ## Step 1 — Update the system
@@ -42,7 +42,7 @@ Choose a working directory, e.g. `/opt/app`:
 ```bash
 sudo mkdir -p /opt/app && sudo chown -R $USER:$USER /opt/app
 cd /opt/app
-git clone https://github.com/shaxowskiy1/urfu-sber-trucking-projectWorkshop.git trucking-app
+git clone -b deploy https://github.com/frozyaC/urfu-sber-trucking-projectWorkshop.git trucking-app
 cd trucking-app
 ```
 
@@ -53,9 +53,10 @@ Project entrypoints:
 ## Step 5 — Run in HTTP mode (quick start)
 Build images (first run) and start everything detached:
 ```bash
-docker compose pull
 docker compose up -d --build
 ```
+
+**Note:** Do NOT run `docker compose pull` before building custom images. This command is only for pre-built images from registries. Since all services are built locally, proceed directly with `docker compose up -d --build`.
 
 What starts and how it is exposed by default (from docker-compose.yaml):
 - Port 80 → nginx-gateway (public entry; proxies to frontend and API gateway)
@@ -67,11 +68,11 @@ What starts and how it is exposed by default (from docker-compose.yaml):
 Verify:
 ```bash
 docker compose ps
-curl -I http://<SERVER_IP>/
-curl -I http://<SERVER_IP>/api/  # or a known health/actuator path
+curl -I http://193.108.114.95/
+curl -I http://193.108.114.95/api/  # or a known health/actuator path
 ```
 
-Browser access: `http://<SERVER_IP>/` (or your domain if DNS is set).
+Browser access: `http://193.108.114.95/` (or your domain if DNS is set).
 
 ## Step 6 — Optional HTTPS (recommended for production)
 We will place Caddy in front of the existing nginx-gateway. Caddy handles TLS certificates automatically.
@@ -142,7 +143,7 @@ curl -I https://app.example.com/api/
   - `docker compose logs -f nginx-gateway`
   - `docker compose logs -f api-gateway-service`
 - Update code and rebuild:
-  - `git pull`
+  - `git pull origin deploy`
   - `docker compose up -d --build`
 - Stop stack: `docker compose down`
 
@@ -158,14 +159,25 @@ cat backup_YYYY-MM-DD.sql | docker exec -i postgres psql -U appuser -d appdb
 
 ## Step 9 — Hardening basics
 - Change default DB credentials in `docker-compose.yaml` or a private override before production.
-- Add restart policies via an override if desired (most services can use `restart: unless-stopped`).
+- All services use `restart: unless-stopped` policy - they will automatically restart on failure or after system reboot.
 - Keep ports 5432, 8080–8084, 8089 closed on the firewall/security group; access them only from inside the VPS or via SSH tunnel/VPN.
 - Disable or restrict WireMock in production if not needed.
+- All Nginx containers run as non-root user (`nginx`) for security, with proper permissions configured.
 
-## Step 10 — Troubleshooting
+## Step 10 — Docker configuration details
+The project has been configured with the following security and reliability features:
+- **Nginx containers**: Run as non-privileged `nginx` user, with PID and temporary files in `/tmp` to avoid permission issues.
+- **Restart policies**: All services automatically restart unless explicitly stopped.
+- **Health checks**: All services have health checks to ensure they're running correctly.
+- **Multi-stage builds**: Frontend and backend services use optimized multi-stage Docker builds.
+- **Network isolation**: All services communicate through a dedicated Docker network (`app-network`).
+
+## Step 11 — Troubleshooting
 - Unhealthy service: `docker compose ps` then `docker compose logs -f <service>`.
 - Port already in use: `sudo lsof -iTCP -sTCP:LISTEN -P | grep :80` and stop/adjust the conflicting service.
 - TLS not issued: ensure the domain points to the server IP, ports 80/443 are open, and no other service binds those ports.
 - 502/504: verify upstream services are healthy and reachable by name inside the network (e.g., `nginx-gateway` → `api-gateway-service:8080`).
+- **Nginx permission errors**: If you see errors about `/run/nginx.pid` or `/var/cache/nginx`, this has been fixed by running Nginx as non-root user with temp files in `/tmp`.
+- **Container won't start after reboot**: All services have `restart: unless-stopped`, so they should auto-start. Check `docker compose ps` and logs.
 
 Done. Your app should now be reachable via HTTP or HTTPS depending on the chosen setup.
