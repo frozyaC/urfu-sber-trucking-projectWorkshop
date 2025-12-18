@@ -58,6 +58,8 @@ docker compose up -d --build
 
 **Note:** Do NOT run `docker compose pull` before building custom images. This command is only for pre-built images from registries. Since all services are built locally, proceed directly with `docker compose up -d --build`.
 
+**Important:** Java backend services may take 30–60 seconds to fully start and become healthy. During this time, you may see `health: starting` status. This is normal. Use `watch -n 2 docker compose ps` to monitor the startup progress.
+
 What starts and how it is exposed by default (from docker-compose.yaml):
 - Port 80 → nginx-gateway (public entry; proxies to frontend and API gateway)
 - Port 3001 → frontend-service (for internal/dev use; prefer port 80)
@@ -67,10 +69,10 @@ What starts and how it is exposed by default (from docker-compose.yaml):
 
 Verify:
 ```bash
+# Check all containers are running
 docker compose ps
 
-# Wait for all services to become healthy (may take 1-2 minutes for Java services)
-# You can watch the status with:
+# Monitor startup progress (Java services take 30-60s to become healthy)
 watch -n 2 docker compose ps
 
 # Once services are healthy, test endpoints:
@@ -78,7 +80,13 @@ curl -I http://193.108.114.95/
 curl -I http://193.108.114.95/api/actuator/health
 ```
 
-**Note:** Java backend services may take 30-60 seconds to start and become healthy. The `start_period` in health checks allows time for initialization.
+**Expected startup sequence:**
+1. PostgreSQL starts first (5-10 seconds) - **healthy**
+2. WireMock starts (10-15 seconds) - **healthy**
+3. Frontend & Nginx start (5-10 seconds) - **healthy** 
+4. Backend Java services start (30-60 seconds) - **health: starting** → **healthy**
+
+All services should be healthy within 2 minutes of startup.
 
 Browser access: `http://193.108.114.95/` (or your domain if DNS is set).
 
