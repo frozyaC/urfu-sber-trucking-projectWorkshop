@@ -18,6 +18,7 @@ import java.util.List;
 @RequestMapping("/api/auth")
 @Slf4j
 @CrossOrigin(origins = {
+        "http://193.108.114.95",
         "http://localhost:3003",
         "http://localhost:3001"
 }, maxAge = 3600)
