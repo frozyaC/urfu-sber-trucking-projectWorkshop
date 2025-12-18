@@ -17,8 +17,7 @@ RUN npm run build
 FROM nginx:alpine
 
 # Создаем кастомный nginx.conf для работы от непривилегированного пользователя
-RUN printf 'user nginx;\n\
-worker_processes auto;\n\
+RUN printf 'worker_processes auto;\n\
 pid /tmp/nginx.pid;\n\
 error_log /var/log/nginx/error.log warn;\n\
 \n\
