@@ -159,27 +159,14 @@ export function AuthForm({ onLogin }: AuthFormProps) {
     }
 
     const url = isLogin
-      ? '/api/auth/sign-in'
-      : '/api/auth/sign-up';
+      ? '/api/auth/login'
+      : '/api/auth/register';
 
     try {
-      const payload = isLogin
-        ? {
-            username: formData.inn,
-            password: formData.password,
-          }
-        : {
-            username: formData.inn,
-            password: formData.password,
-            confirmPassword: formData.password,
-            firstname: formData.company || 'User',
-            lastname: formData.userType || 'User',
-          };
-
       const response = await fetch(url, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(payload)
+        body: JSON.stringify(formData)
       });
 
       const text = await response.text();
@@ -192,12 +179,13 @@ export function AuthForm({ onLogin }: AuthFormProps) {
         return;
       }
 
-      // Backend returns "ok" on sign-in; on sign-up returns {username}
+      // simple-auth returns user object on both login and register
+      const user = result.user || result;
       onLogin({
-        inn: formData.inn,
-        company: formData.company,
-        userType: formData.userType,
-        name: formData.company || 'Пользователь'
+        inn: user.inn || formData.inn,
+        company: user.company || formData.company,
+        userType: user.userType || formData.userType,
+        name: user.name || user.company || 'Пользователь'
       });
     } catch (err) {
       setLoginError('Ошибка соединения с сервером');

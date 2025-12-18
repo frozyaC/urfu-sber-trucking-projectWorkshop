@@ -5,9 +5,9 @@ spring:
   cloud:
     gateway:
       routes:
-        # auth-trucking-service (основная авторизация)
-        - id: auth-trucking-service
-          uri: http://auth-trucking-service:8080
+        # simple-auth: auth (login/register)
+        - id: simple-auth-auth
+          uri: http://simple-auth-trucking-service:8080
           predicates:
             - Path=/api/auth/**
 
