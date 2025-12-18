@@ -162,6 +162,8 @@ services:
       SPRING_DATASOURCE_USERNAME: appuser
       SPRING_DATASOURCE_PASSWORD: apppassword
       WIREMOCK_BASE_URL: http://wiremock:8080
+      SPRING_FLYWAY_ENABLED: "false"
+      SPRING_FLYWAY_ENABLED: "false"
     ports:
       - "8084:8080"
     networks:
@@ -206,12 +208,7 @@ services:
       - "80:80"  # основной вход в систему — http://localhost
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:8080/ > /dev/null || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
+
 
 networks:
   app-network:
