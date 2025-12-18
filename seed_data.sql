@@ -1,7 +1,7 @@
 -- Заполнение базы данных тестовыми данными
 
 -- 5 водителей
-INSERT INTO drivers (id, name, phone, "licenseNumber", availability, comment) VALUES
+INSERT INTO drivers (id, name, phone, license_number, availability, comment) VALUES
 ('DRV001', 'Иванов Иван Иванович', '+7-900-123-4501', 'AB1234567890', 'Доступен', 'Опытный водитель, стаж 10 лет'),
 ('DRV002', 'Петров Петр Петрович', '+7-900-123-4502', 'CD2345678901', 'Доступен', 'Специализация: международные перевозки'),
 ('DRV003', 'Сидоров Сидор Сидорович', '+7-900-123-4503', 'EF3456789012', 'Доступен', 'Категории B, C, E'),
@@ -9,7 +9,7 @@ INSERT INTO drivers (id, name, phone, "licenseNumber", availability, comment) VA
 ('DRV005', 'Новиков Дмитрий Алексеевич', '+7-900-123-4505', 'IJ5678901234', 'Доступен', 'Рефрижераторные перевозки');
 
 -- 5 грузовиков
-INSERT INTO trucks (id, make, model, year, "licensePlate", "vinNumber", "maintenanceStatus") VALUES
+INSERT INTO trucks (id, make, model, year, license_plate, vin_number, maintenance_status) VALUES
 ('TRK001', 'Volvo', 'FH16', 2021, 'А123ВС77', 'YV2AG20C8CB123456', 'Исправен'),
 ('TRK002', 'Scania', 'R500', 2020, 'В456ЕК99', 'YS2R6X40005123789', 'Исправен'),
 ('TRK003', 'Mercedes-Benz', 'Actros', 2022, 'С789МО66', 'WDB96341011234567', 'На обслуживании'),
@@ -17,7 +17,7 @@ INSERT INTO trucks (id, make, model, year, "licensePlate", "vinNumber", "mainten
 ('TRK005', 'DAF', 'XF', 2021, 'К567ТУ178', 'XLRAE69M00E234567', 'Исправен');
 
 -- 5 прицепов
-INSERT INTO trailers (id, "licensePlate", "trailerType", length, width, height, volume, comment) VALUES
+INSERT INTO trailers (id, license_plate, trailer_type, length, width, height, volume, comment) VALUES
 ('TRL001', 'АВ1234-77', 'Тентованный', '13.6', '2.45', '2.7', '90', 'Стандартный европрицеп'),
 ('TRL002', 'ВЕ5678-99', 'Рефрижератор', '13.6', '2.45', '2.6', '86', 'Температурный режим от -20 до +20°C'),
 ('TRL003', 'СМ9012-66', 'Бортовой', '13.6', '2.45', '2.8', '93', 'Усиленная платформа'),
@@ -25,7 +25,7 @@ INSERT INTO trailers (id, "licensePlate", "trailerType", length, width, height, 
 ('TRL005', 'КТ7890-178', 'Тентованный', '13.6', '2.45', '2.7', '90', 'Новый прицеп 2023 г.');
 
 -- 5 связей водитель-транспорт-прицеп
-INSERT INTO fleet_assignments (id, "driverId", "truckId", "trailerId", "assignedDate") VALUES
+INSERT INTO fleet_assignments (id, driver_id, truck_id, trailer_id, assigned_date) VALUES
 ('FLA001', 'DRV001', 'TRK001', 'TRL001', '2024-01-15'),
 ('FLA002', 'DRV002', 'TRK002', 'TRL002', '2024-01-16'),
 ('FLA003', 'DRV003', 'TRK003', 'TRL003', '2024-01-17'),
@@ -34,12 +34,12 @@ INSERT INTO fleet_assignments (id, "driverId", "truckId", "trailerId", "assigned
 
 -- 5 заказов
 INSERT INTO orders (
-    "shipperName", "managerName", origin, destination,
-    "originLatitude", "originLongitude", "destinationLatitude", "destinationLongitude",
-    "trailerType", volume, weight,
-    "pickupDate", "pickupTime", "deliveryDate", "deliveryTime",
-    "cargoType", "specialRequirements", "transportationCost",
-    length, width, height, "vehicleCount", "externalOrderNumber", status, "assignedDriverId"
+    shipper_name, manager_name, origin, destination,
+    origin_latitude, origin_longitude, destination_latitude, destination_longitude,
+    trailer_type, volume, weight,
+    pickup_date, pickup_time, delivery_date, delivery_time,
+    cargo_type, special_requirements, transportation_cost,
+    length, width, height, vehicle_count, external_order_number, status, assigned_driver_id
 ) VALUES
 (
     'ООО "Торговый Дом"', 'Смирнова А.П.', 'Москва, ул. Ленина 1', 'Санкт-Петербург, Невский пр. 50',
