@@ -1,0 +1,14 @@
+target
+.mvn
+.mvnw
+mvnw.cmd
+.idea
+*.iml
+.git
+.gitignore
+HELP.md
+Dockerfile
+*.log
+*.tmp
+*.swp
+*.swo

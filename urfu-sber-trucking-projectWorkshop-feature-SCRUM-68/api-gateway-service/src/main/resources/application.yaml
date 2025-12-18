@@ -1,0 +1,37 @@
+#spring.config.import=optional:file:.env[.properties]
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  cloud:
+    gateway:
+      routes:
+        # auth-trucking-service (основная авторизация)
+        - id: auth-trucking-service
+          uri: http://auth-trucking-service:8080
+          predicates:
+            - Path=/api/auth/**
+
+        # simple-auth-trucking-service (упрощённая авторизация, если нужно)
+        - id: simple-auth-trucking-service
+          uri: http://simple-auth-trucking-service:8080
+          predicates:
+            - Path=/api/simple-auth/**
+
+        # daily-status-update-service
+        - id: daily-status-update-service
+          uri: http://daily-status-update-service:8080
+          predicates:
+            - Path=/api/daily-status/**
+
+        # match-service
+        - id: match-service
+          uri: http://match-service:8080
+          predicates:
+            - Path=/api/match/**
+  main:
+    web-application-type: reactive
+server:
+  port: 8080
+
+jwt:
+  secret: ${JWT_SECRET}

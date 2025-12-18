@@ -1,0 +1,15 @@
+target
+.mvn
+.mvnw
+mvnw.cmd
+.idea
+*.iml
+.git
+.gitignore
+docker-compose.yaml
+HELP.md
+Dockerfile
+*.log
+*.tmp
+*.swp
+*.swo
