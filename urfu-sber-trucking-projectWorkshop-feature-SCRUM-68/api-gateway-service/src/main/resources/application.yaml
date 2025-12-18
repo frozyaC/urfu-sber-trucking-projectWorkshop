@@ -11,13 +11,49 @@ spring:
           predicates:
             - Path=/api/auth/**
 
-        # simple-auth-trucking-service (все основные API для заказов, водителей, транспорта и т.д.)
-        - id: simple-auth-main-api
+        # simple-auth: orders
+        - id: simple-auth-orders
           uri: http://simple-auth-trucking-service:8080
           predicates:
-            - Path=/api/orders/**,/api/drivers/**,/api/trucks/**,/api/trailers/**,/api/fleet-assignments/**,/api/calculate/**,/api/users/**
+            - Path=/api/orders/**
 
-        # simple-auth-trucking-service (упрощённая авторизация, если нужно)
+        # simple-auth: drivers
+        - id: simple-auth-drivers
+          uri: http://simple-auth-trucking-service:8080
+          predicates:
+            - Path=/api/drivers/**
+
+        # simple-auth: trucks
+        - id: simple-auth-trucks
+          uri: http://simple-auth-trucking-service:8080
+          predicates:
+            - Path=/api/trucks/**
+
+        # simple-auth: trailers
+        - id: simple-auth-trailers
+          uri: http://simple-auth-trucking-service:8080
+          predicates:
+            - Path=/api/trailers/**
+
+        # simple-auth: fleet-assignments
+        - id: simple-auth-fleet
+          uri: http://simple-auth-trucking-service:8080
+          predicates:
+            - Path=/api/fleet-assignments/**
+
+        # simple-auth: calculate
+        - id: simple-auth-calculate
+          uri: http://simple-auth-trucking-service:8080
+          predicates:
+            - Path=/api/calculate/**
+
+        # simple-auth: users
+        - id: simple-auth-users
+          uri: http://simple-auth-trucking-service:8080
+          predicates:
+            - Path=/api/users/**
+
+        # simple-auth-trucking-service (упрощённая авторизация)
         - id: simple-auth-trucking-service
           uri: http://simple-auth-trucking-service:8080
           predicates:
