@@ -11,6 +11,12 @@ spring:
           predicates:
             - Path=/api/auth/**
 
+        # simple-auth-trucking-service (все основные API для заказов, водителей, транспорта и т.д.)
+        - id: simple-auth-main-api
+          uri: http://simple-auth-trucking-service:8080
+          predicates:
+            - Path=/api/orders/**,/api/drivers/**,/api/trucks/**,/api/trailers/**,/api/fleet-assignments/**,/api/calculate/**,/api/users/**
+
         # simple-auth-trucking-service (упрощённая авторизация, если нужно)
         - id: simple-auth-trucking-service
           uri: http://simple-auth-trucking-service:8080

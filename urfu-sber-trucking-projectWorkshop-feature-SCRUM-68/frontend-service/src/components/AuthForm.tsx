@@ -159,25 +159,46 @@ export function AuthForm({ onLogin }: AuthFormProps) {
     }
 
     const url = isLogin
-      ? '/api/auth/login'
-      : '/api/auth/register';
+      ? '/api/auth/sign-in'
+      : '/api/auth/sign-up';
 
     try {
+      const payload = isLogin
+        ? {
+            username: formData.inn,
+            password: formData.password,
+          }
+        : {
+            username: formData.inn,
+            password: formData.password,
+            confirmPassword: formData.password,
+            firstname: formData.company || 'User',
+            lastname: formData.userType || 'User',
+          };
+
       const response = await fetch(url, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
-      const result = await response.json();
+
+      const text = await response.text();
+      let result: any = text;
+      try { result = text ? JSON.parse(text) : {}; } catch { /* plain text */ }
 
       if (!response.ok) {
-        setLoginError(result.message || 'Ошибка авторизации / регистрации');
+        const message = typeof result === 'string' ? result : result?.message;
+        setLoginError(message || 'Ошибка авторизации / регистрации');
         return;
       }
 
-      // Возвращаем только нужные поля с безопасным значением имени
-      const { inn, company, userType, name } = result.user || result;
-      onLogin({ inn, company, userType, name: name || 'Пользователь' });
+      // Backend returns "ok" on sign-in; on sign-up returns {username}
+      onLogin({
+        inn: formData.inn,
+        company: formData.company,
+        userType: formData.userType,
+        name: formData.company || 'Пользователь'
+      });
     } catch (err) {
       setLoginError('Ошибка соединения с сервером');
     }
