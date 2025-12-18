@@ -68,9 +68,17 @@ What starts and how it is exposed by default (from docker-compose.yaml):
 Verify:
 ```bash
 docker compose ps
+
+# Wait for all services to become healthy (may take 1-2 minutes for Java services)
+# You can watch the status with:
+watch -n 2 docker compose ps
+
+# Once services are healthy, test endpoints:
 curl -I http://193.108.114.95/
-curl -I http://193.108.114.95/api/  # or a known health/actuator path
+curl -I http://193.108.114.95/api/actuator/health
 ```
+
+**Note:** Java backend services may take 30-60 seconds to start and become healthy. The `start_period` in health checks allows time for initialization.
 
 Browser access: `http://193.108.114.95/` (or your domain if DNS is set).
 
@@ -173,11 +181,53 @@ The project has been configured with the following security and reliability feat
 - **Network isolation**: All services communicate through a dedicated Docker network (`app-network`).
 
 ## Step 11 — Troubleshooting
+
+### Common Issues
+
+**Services showing as "unhealthy":**
+```bash
+# Check logs for specific service
+docker compose logs --tail=100 <service-name>
+
+# For frontend/nginx issues:
+docker compose logs frontend-service
+docker compose logs nginx-gateway
+
+# Test nginx configuration
+docker exec frontend-service nginx -t
+
+# For backend services (may need more startup time):
+docker compose logs api-gateway-service
+docker compose logs auth-trucking-service
+
+# Check if services can communicate internally
+docker exec nginx-gateway wget -qO- http://frontend-service/
+docker exec nginx-gateway wget -qO- http://api-gateway-service:8080/actuator/health
+```
+
+**Other issues:**
 - Unhealthy service: `docker compose ps` then `docker compose logs -f <service>`.
 - Port already in use: `sudo lsof -iTCP -sTCP:LISTEN -P | grep :80` and stop/adjust the conflicting service.
 - TLS not issued: ensure the domain points to the server IP, ports 80/443 are open, and no other service binds those ports.
 - 502/504: verify upstream services are healthy and reachable by name inside the network (e.g., `nginx-gateway` → `api-gateway-service:8080`).
 - **Nginx permission errors**: If you see errors about `/run/nginx.pid` or `/var/cache/nginx`, this has been fixed by running Nginx as non-root user with temp files in `/tmp`.
 - **Container won't start after reboot**: All services have `restart: unless-stopped`, so they should auto-start. Check `docker compose ps` and logs.
+
+### Force Rebuild
+
+If issues persist after checking logs:
+```bash
+# Stop all services
+docker compose down
+
+# Remove all images to force fresh build
+docker compose down --rmi all
+
+# Rebuild and restart
+docker compose up -d --build --force-recreate
+
+# Monitor startup
+docker compose logs -f
+```
 
 Done. Your app should now be reachable via HTTP or HTTPS depending on the chosen setup.
