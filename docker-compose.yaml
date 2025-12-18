@@ -78,6 +78,8 @@ services:
       SPRING_DATASOURCE_USERNAME: appuser
       SPRING_DATASOURCE_PASSWORD: apppassword
       WIREMOCK_BASE_URL: http://wiremock:8080
+      SPRING_FLYWAY_ENABLED: "false"
+      JAVA_OPTS: "-Dspring.flyway.enabled=false"
     ports:
       - "8081:8080"
     networks:
@@ -163,12 +165,13 @@ services:
       SPRING_DATASOURCE_PASSWORD: apppassword
       WIREMOCK_BASE_URL: http://wiremock:8080
       SPRING_FLYWAY_ENABLED: "false"
+      JAVA_OPTS: "-Dspring.flyway.enabled=false"
     ports:
       - "8084:8080"
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/ || exit 1"]
+      test: ["CMD-SHELL", "curl -s http://localhost:8080/ > /dev/null || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 10
