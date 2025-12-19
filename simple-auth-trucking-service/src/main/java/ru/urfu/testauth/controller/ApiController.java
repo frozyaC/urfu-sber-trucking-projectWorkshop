@@ -76,7 +76,7 @@ public class ApiController {
     @PostMapping("/orders/create")
     public ResponseEntity<?> createOrder(@RequestBody Map<String, Object> request) {
         log.info("Запрос дошёл");
-        List<String> required = List.of("shipperName", "managerName", "origin", "destination", "pickupDate", "deliveryDate", "transportationCost");
+        List<String> required = List.of("shipperName", "managerName", "origin", "destination", "pickupDate", "deliveryDate", "transportationCost", "vehicleCount");
         List<String> missing = new ArrayList<>();
         for (String f : required)
             if (!request.containsKey(f) || request.get(f) == null || request.get(f).toString().isEmpty())
@@ -84,14 +84,12 @@ public class ApiController {
         if (!missing.isEmpty())
             return ResponseEntity.badRequest().body(Map.of("message", "Заполните все обязательные поля: " + String.join(", ", missing)));
         Double cost;
-        Integer vehicleCount = 1;
+        Integer vehicleCount;
         try {
             cost = Double.parseDouble(request.get("transportationCost").toString());
-            if (request.get("vehicleCount") != null && !request.get("vehicleCount").toString().isBlank()) {
-                vehicleCount = Integer.parseInt(request.get("vehicleCount").toString());
-            }
+            vehicleCount = Integer.parseInt(request.get("vehicleCount").toString());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("message","Стоимость должна быть числом"));
+            return ResponseEntity.badRequest().body(Map.of("message","Стоимость и количество транспорта должны быть числами"));
         }
         if (cost <= 0) return ResponseEntity.badRequest().body(Map.of("message", "Стоимость должна быть положительным числом"));
         if (vehicleCount < 1 || vehicleCount > 5) return ResponseEntity.badRequest().body(Map.of("message", "Количество транспорта должно быть от 1 до 5"));
@@ -108,10 +106,10 @@ public class ApiController {
                         .managerName((String) request.get("managerName"))
                         .origin((String) request.get("origin"))
                         .destination((String) request.get("destination"))
-                        .originLatitude(toDoubleOrNull(request.get("originLatitude")))
-                        .originLongitude(toDoubleOrNull(request.get("originLongitude")))
-                        .destinationLatitude(toDoubleOrNull(request.get("destinationLatitude")))
-                        .destinationLongitude(toDoubleOrNull(request.get("destinationLongitude")))
+                        .originLatitude(request.get("originLatitude")==null?null:Double.valueOf(request.get("originLatitude").toString()))
+                        .originLongitude(request.get("originLongitude")==null?null:Double.valueOf(request.get("originLongitude").toString()))
+                        .destinationLatitude(request.get("destinationLatitude")==null?null:Double.valueOf(request.get("destinationLatitude").toString()))
+                        .destinationLongitude(request.get("destinationLongitude")==null?null:Double.valueOf(request.get("destinationLongitude").toString()))
                         .trailerType((String) request.getOrDefault("trailerType", null))
                         .volume(request.get("volume") == null ? 0.0 : Double.valueOf(request.get("volume").toString().replaceAll("[^\\d.-]", "")))                        .weight(request.get("weight")==null?null:Double.valueOf(request.get("weight").toString()))
                         .pickupDate(pickupDate)
@@ -137,17 +135,6 @@ public class ApiController {
         } catch (Exception e) {
             log.error("Ошибка при создании заказа: ", e);
             return ResponseEntity.internalServerError().body(Map.of("message", "Ошибка сервера при создании заказа"));
-        }
-    }
-
-    private Double toDoubleOrNull(Object value) {
-        if (value == null) return null;
-        String s = value.toString().trim();
-        if (s.isEmpty()) return null;
-        try {
-            return Double.valueOf(s.replaceAll("[^\\d.-]", ""));
-        } catch (NumberFormatException ex) {
-            return null;
         }
     }
 
