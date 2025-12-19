@@ -27,36 +27,48 @@ spring:
           uri: http://simple-auth-trucking-service:8080
           predicates:
             - Path=/api/auth/**
+          filters:
+            - StripPrefix=1
 
         # simple-auth: orders
         - id: simple-auth-orders
           uri: http://simple-auth-trucking-service:8080
           predicates:
             - Path=/api/orders/**
+          filters:
+            - StripPrefix=1
 
         # simple-auth: drivers
         - id: simple-auth-drivers
           uri: http://simple-auth-trucking-service:8080
           predicates:
             - Path=/api/drivers/**
+          filters:
+            - StripPrefix=1
 
         # simple-auth: trucks
         - id: simple-auth-trucks
           uri: http://simple-auth-trucking-service:8080
           predicates:
             - Path=/api/trucks/**
+          filters:
+            - StripPrefix=1
 
         # simple-auth: trailers
         - id: simple-auth-trailers
           uri: http://simple-auth-trucking-service:8080
           predicates:
             - Path=/api/trailers/**
+          filters:
+            - StripPrefix=1
 
         # simple-auth: fleet-assignments
         - id: simple-auth-fleet
           uri: http://simple-auth-trucking-service:8080
           predicates:
             - Path=/api/fleet-assignments/**
+          filters:
+            - StripPrefix=1
 
         # match-service: calculate (driver matching)
         - id: match-calculate
@@ -69,12 +81,16 @@ spring:
           uri: http://simple-auth-trucking-service:8080
           predicates:
             - Path=/api/users/**
+          filters:
+            - StripPrefix=1
 
         # simple-auth-trucking-service (упрощённая авторизация)
         - id: simple-auth-trucking-service
           uri: http://simple-auth-trucking-service:8080
           predicates:
             - Path=/api/simple-auth/**
+          filters:
+            - StripPrefix=1
 
         # daily-status-update-service
         - id: daily-status-update-service
