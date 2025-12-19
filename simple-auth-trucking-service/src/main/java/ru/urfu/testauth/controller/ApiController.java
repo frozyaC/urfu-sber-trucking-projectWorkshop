@@ -45,6 +45,31 @@ public class ApiController {
         return null;
     }
 
+    private Double parseNullableDouble(Map<String, Object> request, String key) throws NumberFormatException {
+        Object raw = request.get(key);
+        if (raw == null) return null;
+        String s = raw.toString().trim();
+        if (s.isEmpty()) return null;
+        // allow values with units, strip non-numeric symbols
+        s = s.replaceAll("[^\\d.-]", "");
+        if (s.isEmpty()) return null;
+        return Double.valueOf(s);
+    }
+
+    private Double parseRequiredDouble(Map<String, Object> request, String key, String fieldName) {
+        Double v = parseNullableDouble(request, key);
+        if (v == null) throw new IllegalArgumentException(fieldName + " обязательно и должно быть числом");
+        return v;
+    }
+
+    private Integer parseRequiredInt(Map<String, Object> request, String key, String fieldName) {
+        Object raw = request.get(key);
+        if (raw == null || raw.toString().trim().isEmpty()) {
+            throw new IllegalArgumentException(fieldName + " обязательно и должно быть числом");
+        }
+        return Integer.parseInt(raw.toString().trim());
+    }
+
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody User user) {
 
@@ -86,9 +111,9 @@ public class ApiController {
         Double cost;
         Integer vehicleCount;
         try {
-            cost = Double.parseDouble(request.get("transportationCost").toString());
-            vehicleCount = Integer.parseInt(request.get("vehicleCount").toString());
-        } catch (Exception e) {
+            cost = parseRequiredDouble(request, "transportationCost", "Стоимость");
+            vehicleCount = parseRequiredInt(request, "vehicleCount", "Количество транспорта");
+        } catch (IllegalArgumentException | NumberFormatException e) {
             return ResponseEntity.badRequest().body(Map.of("message","Стоимость и количество транспорта должны быть числами"));
         }
         if (cost <= 0) return ResponseEntity.badRequest().body(Map.of("message", "Стоимость должна быть положительным числом"));
@@ -111,7 +136,8 @@ public class ApiController {
                         .destinationLatitude(request.get("destinationLatitude")==null?null:Double.valueOf(request.get("destinationLatitude").toString()))
                         .destinationLongitude(request.get("destinationLongitude")==null?null:Double.valueOf(request.get("destinationLongitude").toString()))
                         .trailerType((String) request.getOrDefault("trailerType", null))
-                        .volume(request.get("volume") == null ? 0.0 : Double.valueOf(request.get("volume").toString().replaceAll("[^\\d.-]", "")))                        .weight(request.get("weight")==null?null:Double.valueOf(request.get("weight").toString()))
+                        .volume(parseNullableDouble(request, "volume"))
+                        .weight(parseNullableDouble(request, "weight"))
                         .pickupDate(pickupDate)
                         .pickupTime(request.get("pickupTime")==null?null:LocalTime.parse(request.get("pickupTime").toString()))
                         .deliveryDate(deliveryDate)
@@ -119,9 +145,9 @@ public class ApiController {
                         .cargoType((String) request.getOrDefault("cargoType", null))
                         .specialRequirements((String) request.getOrDefault("specialRequirements", ""))
                         .transportationCost(cost)
-                        .length(request.get("length")==null?null:Double.valueOf(request.get("length").toString()))
-                        .width(request.get("width")==null?null:Double.valueOf(request.get("width").toString()))
-                        .height(request.get("height")==null?null:Double.valueOf(request.get("height").toString()))
+                        .length(parseNullableDouble(request, "length"))
+                        .width(parseNullableDouble(request, "width"))
+                        .height(parseNullableDouble(request, "height"))
                         .vehicleCount(1)
                         .externalOrderNumber((String) request.getOrDefault("externalOrderNumber", null))
                         .status("Ожидает")
