@@ -249,8 +249,8 @@ export function OrderDetailModal({
    * Отменить назначение водителя
    */
   const handleUnassignDriver = async () => {
-    // Единственный запрос: меняем статус на "Ожидает" на основном бэкенде
-    await onUpdateStatus(order.id, 'Ожидает');
+    // Единственный запрос: меняем статус на "Создан" на основном бэкенде
+    await onUpdateStatus(order.id, 'Создан');
     // Локально снимаем назначение
     onAssignDriverToOrder(order.id, null);
     // Сброс локальных флагов
@@ -273,7 +273,7 @@ export function OrderDetailModal({
    * Отметить заказ как доставленный
    */
   const handleCompleteOrder = () => {
-    onUpdateStatus(order.id, 'Доставлен');
+    onUpdateStatus(order.id, 'Завершен');
   };
 
   /**
@@ -590,10 +590,10 @@ export function OrderDetailModal({
                   <Button
                     variant="default"
                     onClick={handleCompleteOrder}
-                    disabled={order.status === 'Доставлен'}
+                    disabled={order.status === 'Завершен'}
                   >
                     <CheckCircle2 className="h-4 w-4 mr-2" />
-                    Заказ доставлен
+                    Заказ завершен
                   </Button>
                   <Button
                     variant="destructive"

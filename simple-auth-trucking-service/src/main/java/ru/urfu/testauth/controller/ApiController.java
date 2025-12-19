@@ -124,7 +124,7 @@ public class ApiController {
                         .height(request.get("height")==null?null:Double.valueOf(request.get("height").toString()))
                         .vehicleCount(1)
                         .externalOrderNumber((String) request.getOrDefault("externalOrderNumber", null))
-                        .status("Ожидает")
+                        .status("Создан")
                         .assignedDriverId(null);
                 orders.add(orderService.createOrder(builder.build()));
             }

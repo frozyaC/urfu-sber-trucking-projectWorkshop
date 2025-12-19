@@ -1,16 +1,16 @@
 import type { CSSProperties } from 'react';
 
-type OrderStatus = 'Ожидает' | 'Назначен' | 'В пути' | 'Доставлен' | 'Отменен';
+type OrderStatus = 'Создан' | 'На погрузке' | 'В пути' | 'На выгрузке' | 'Завершен' | 'Отменен';
 
 type StatusStyle = CSSProperties;
 
 const STATUS_STYLES: Record<OrderStatus, StatusStyle> = {
-  'Ожидает': {
-    backgroundColor: '#fee2e2',
-    color: '#b91c1c',
-    borderColor: '#fecaca'
+  'Создан': {
+    backgroundColor: '#e5e7eb',
+    color: '#111827',
+    borderColor: '#d1d5db'
   },
-  'Назначен': {
+  'На погрузке': {
     backgroundColor: '#ffedd5',
     color: '#c2410c',
     borderColor: '#fed7aa'
@@ -20,10 +20,15 @@ const STATUS_STYLES: Record<OrderStatus, StatusStyle> = {
     color: '#15803d',
     borderColor: '#bbf7d0'
   },
-  'Доставлен': {
-    backgroundColor: '#cffafe',
-    color: '#0f766e',
-    borderColor: '#a5f3fc'
+  'На выгрузке': {
+    backgroundColor: '#e0f2fe',
+    color: '#075985',
+    borderColor: '#bae6fd'
+  },
+  'Завершен': {
+    backgroundColor: '#ede9fe',
+    color: '#5b21b6',
+    borderColor: '#ddd6fe'
   },
   'Отменен': {
     backgroundColor: '#1f2937',
