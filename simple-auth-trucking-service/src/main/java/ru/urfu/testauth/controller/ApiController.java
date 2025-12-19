@@ -113,7 +113,7 @@ public class ApiController {
         try {
             cost = parseRequiredDouble(request, "transportationCost", "Стоимость");
             vehicleCount = parseRequiredInt(request, "vehicleCount", "Количество транспорта");
-        } catch (IllegalArgumentException | NumberFormatException e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("message","Стоимость и количество транспорта должны быть числами"));
         }
         if (cost <= 0) return ResponseEntity.badRequest().body(Map.of("message", "Стоимость должна быть положительным числом"));
