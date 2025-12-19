@@ -62,27 +62,8 @@ public class DriverController {
     }
 
     @PostMapping("/api/calculate/assign")
-    public ResponseEntity<?> assignDriver(@RequestBody java.util.Map<String, Object> request) {
-        try {
-            Long orderId = ((Number) request.get("orderId")).longValue();
-            Integer driverId = ((Number) request.get("driverId")).intValue();
-            
-            log.info("Попытка назначить водителя {} на заказ {}", driverId, orderId);
-            
-            // Обновляем заказ с назначенным водителем
-            driverService.assignDriverToOrder(orderId, driverId);
-            
-            return ResponseEntity.ok(java.util.Map.of(
-                "message", "Водитель успешно назначен",
-                "orderId", orderId,
-                "driverId", driverId
-            ));
-        } catch (Exception e) {
-            log.error("Ошибка при назначении водителя: ", e);
-            return ResponseEntity.status(500).body(java.util.Map.of(
-                "message", "Ошибка при назначении водителя",
-                "error", e.getMessage()
-            ));
-        }
+    public ResponseEntity<String> assignDriver(
+    ){
+        return ResponseEntity.ok("ok");
     }
 }

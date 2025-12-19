@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import ru.urfu.matchservice.models.CoordinatesDateDTO;
 import ru.urfu.matchservice.models.DriverLegInfo;
 import ru.urfu.matchservice.models.DriverResponseDTO;
-import ru.urfu.matchservice.models.OrderDTO;
 import ru.urfu.matchservice.repository.DriverRepository;
 import ru.urfu.matchservice.repository.OrderRepository;
 import ru.urfu.matchservice.service.route.RouteTimeClient;
@@ -121,20 +120,4 @@ public class DriverService {
             this.originLongitude = originLongitude;
         }
     }
-
-    public void assignDriverToOrder(Long orderId, Integer driverId) {
-        try {
-            OrderDTO order = orderRepository.findById(Math.toIntExact(orderId)).orElse(null);
-            if (order == null) {
-                throw new RuntimeException("Заказ с ID " + orderId + " не найден");
-            }
-            order.setAssignedDriverId(driverId);
-            orderRepository.save(order);
-            log.info("Водитель {} успешно назначен на заказ {}", driverId, orderId);
-        } catch (Exception e) {
-            log.error("Ошибка при назначении водителя на заказ: ", e);
-            throw new RuntimeException("Ошибка при сохранении в БД: " + e.getMessage(), e);
-        }
-    }
 }
-
