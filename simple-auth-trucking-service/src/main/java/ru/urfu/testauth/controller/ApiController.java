@@ -469,8 +469,21 @@ public class ApiController {
     @GetMapping("/fleet-assignments")
     public ResponseEntity<?> getAllFleetAssignments() {
         try {
+            // Возвращаем плоские данные, чтобы избежать ленивой сериализации LAZY-ссылок
             List<FleetAssignment> assignments = fleetAssignmentRepository.findAll();
-            return ResponseEntity.ok(Map.of("assignments", assignments));
+            List<Map<String, Object>> dto = new ArrayList<>(assignments.size());
+
+            for (FleetAssignment a : assignments) {
+                dto.add(Map.of(
+                        "id", a.getId(),
+                        "driverId", a.getDriverId(),
+                        "truckId", a.getTruckId(),
+                        "trailerId", a.getTrailerId(),
+                        "assignedDate", a.getAssignedDate()
+                ));
+            }
+
+            return ResponseEntity.ok(Map.of("assignments", dto));
         } catch (Exception e) {
             log.error("Ошибка при получении связей автопарка", e);
             return ResponseEntity.internalServerError().body(Map.of("message", "Не удалось получить связи автопарка"));
