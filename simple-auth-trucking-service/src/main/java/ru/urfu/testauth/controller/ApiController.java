@@ -468,13 +468,8 @@ public class ApiController {
     // ==================== FLEET ASSIGNMENTS CRUD ====================
     @GetMapping("/fleet-assignments")
     public ResponseEntity<?> getAllFleetAssignments() {
-        try {
-            List<FleetAssignment> assignments = fleetAssignmentRepository.findAll();
-            return ResponseEntity.ok(Map.of("assignments", assignments));
-        } catch (Exception e) {
-            log.error("Ошибка при получении связей автопарка", e);
-            return ResponseEntity.internalServerError().body(Map.of("message", "Не удалось получить связи автопарка"));
-        }
+        List<FleetAssignment> assignments = fleetAssignmentRepository.findAll();
+        return ResponseEntity.ok(Map.of("assignments", assignments));
     }
 
     @GetMapping("/fleet-assignments/{id}")

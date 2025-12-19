@@ -42,8 +42,6 @@ export async function fetchAllTrailers() {
 }
 
 export async function fetchAllFleetAssignments() {
-  console.log('🔄 Запрос связей автопарка: /api/fleet-assignments');
   const data = await fetchJSON<{ assignments: any[] }>('/api/fleet-assignments');
-  console.log('📦 Получено связей:', data?.assignments?.length || 0, data);
   return data?.assignments || [];
 }
