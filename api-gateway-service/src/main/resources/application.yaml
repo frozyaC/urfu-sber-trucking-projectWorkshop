@@ -58,9 +58,9 @@ spring:
           predicates:
             - Path=/api/fleet-assignments/**
 
-        # simple-auth: calculate
-        - id: simple-auth-calculate
-          uri: http://simple-auth-trucking-service:8080
+        # match-service: calculate (driver matching)
+        - id: match-calculate
+          uri: http://match-service:8080
           predicates:
             - Path=/api/calculate/**
 
