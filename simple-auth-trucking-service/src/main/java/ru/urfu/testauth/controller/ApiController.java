@@ -145,8 +145,51 @@ public class ApiController {
     }
 
     @PostMapping("/orders/{id}/status")
-    public ResponseEntity<?> getStatus() {
-        return ResponseEntity.ok("ok");
+    public ResponseEntity<?> postStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        try {
+            String status = body.get("status");
+            Order order = orderService.getOrderById(id);
+            if (order == null) {
+                return ResponseEntity.status(404).body(Map.of("message", "Заказ не найден"));
+            }
+            order.setStatus(status);
+            orderService.saveOrder(order);
+            return ResponseEntity.ok(Map.of("message", "Статус обновлен", "order", order));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "Ошибка при обновлении статуса", "error", e.getMessage()));
+        }
+    }
+
+    @PatchMapping("/orders/{id}/status")
+    public ResponseEntity<?> patchStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        try {
+            String status = body.get("status");
+            Order order = orderService.getOrderById(id);
+            if (order == null) {
+                return ResponseEntity.status(404).body(Map.of("message", "Заказ не найден"));
+            }
+            order.setStatus(status);
+            orderService.saveOrder(order);
+            return ResponseEntity.ok(Map.of("message", "Статус обновлен", "order", order));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "Ошибка при обновлении статуса", "error", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/orders/{id}/status")
+    public ResponseEntity<?> putStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        try {
+            String status = body.get("status");
+            Order order = orderService.getOrderById(id);
+            if (order == null) {
+                return ResponseEntity.status(404).body(Map.of("message", "Заказ не найден"));
+            }
+            order.setStatus(status);
+            orderService.saveOrder(order);
+            return ResponseEntity.ok(Map.of("message", "Статус обновлен", "order", order));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "Ошибка при обновлении статуса", "error", e.getMessage()));
+        }
     }
 
     @DeleteMapping("/orders/{id}")
