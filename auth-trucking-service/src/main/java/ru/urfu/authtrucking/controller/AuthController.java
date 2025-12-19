@@ -1,0 +1,115 @@
+package ru.urfu.authtrucking.controller;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
+import ru.urfu.authtrucking.dto.AuthResponseDTO;
+import ru.urfu.authtrucking.dto.SignInRequestDTO;
+import ru.urfu.authtrucking.dto.SignUpRequestDTO;
+import ru.urfu.authtrucking.exceptions.UserErrorResponse;
+import ru.urfu.authtrucking.exceptions.UserNotCreatedException;
+import ru.urfu.authtrucking.repositories.UserRepository;
+import ru.urfu.authtrucking.service.UserService;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/auth")
+@Slf4j
+public class AuthController {
+
+    private final AuthenticationManager authenticationManager;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncode;
+    private final UserRepository userRepository;
+
+    @Autowired
+    public AuthController(AuthenticationManager authenticationManager, UserService userService, PasswordEncoder passwordEncode, UserRepository userRepository) {
+        this.authenticationManager = authenticationManager;
+        this.userService = userService;
+        this.passwordEncode = passwordEncode;
+        this.userRepository = userRepository;
+    }
+
+    @PostMapping("/sign-up")
+    public ResponseEntity<AuthResponseDTO> registerUser(@Valid @RequestBody SignUpRequestDTO user,
+                                                        BindingResult bindingResult) {
+        log.debug("Received registration request for user: {}", user.getUsername());
+
+        validateBindingResult(bindingResult);
+
+        userService.addUser(user);
+        return new ResponseEntity<>(new AuthResponseDTO(user.getUsername()), HttpStatus.CREATED);
+    }
+
+    private static void validateBindingResult(BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            log.debug("Validate a process of credential user's");
+            StringBuilder sb = new StringBuilder();
+            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+            for (FieldError fieldError : fieldErrors) {
+                sb.append(fieldError.getField() + " - " + fieldError.getDefaultMessage() + ".");
+            }
+            throw new UserNotCreatedException(sb.toString());
+        }
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<UserErrorResponse> handleUserNotCreatedException(UserNotCreatedException e) {
+        UserErrorResponse userErrorResponse = new UserErrorResponse();
+        userErrorResponse.setMessage(e.getMessage());
+        return new ResponseEntity<>(userErrorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+
+    @PostMapping("/sign-in")
+    public ResponseEntity<?> loginUser(@Valid @RequestBody SignInRequestDTO requestUser,
+                                       HttpServletRequest request) {
+        log.info("Received login request for user: {}", requestUser.getUsername());
+        try {
+            Authentication authenticate = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(requestUser.getUsername(),
+                            requestUser.getPassword()));
+            SecurityContext context = SecurityContextHolder.getContext();
+            context.setAuthentication(authenticate);
+
+            HttpSession session = request.getSession(true);
+            session.setAttribute("SPRING_SECURITY_CONTEXT", context);
+            return ResponseEntity.ok("ok");
+//            return ResponseEntity.ok(jwtUtil.generateToken(requestUser));
+        } catch(AuthenticationException e){
+            log.info("Failed sign in {}", e.getMessage());
+            return ResponseEntity.status(401).body("Неверные логин или пароль");
+        }
+    }
+
+    //TODO использовать маппер и решить проблему с JWT токеном
+//    @GetMapping("/user/me")
+//    public ResponseEntity<?> profileUser(){
+//        log.info("Received profile request for user");
+//
+//        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+//        return new ResponseEntity<>(userService.findByUsername(name), HttpStatus.OK);
+//    }
+
+    @PostMapping("/sign-out")
+    public ResponseEntity<?> logoutUser(){
+        log.info("Received logout user");
+        return ResponseEntity.noContent().build();
+    }
+
+}

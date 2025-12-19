@@ -1,0 +1,79 @@
+#spring.config.import=optional:file:.env[.properties]
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  cloud:
+    gateway:
+      routes:
+        # simple-auth: auth (login/register)
+        - id: simple-auth-auth
+          uri: http://simple-auth-trucking-service:8080
+          predicates:
+            - Path=/api/auth/**
+
+        # simple-auth: orders
+        - id: simple-auth-orders
+          uri: http://simple-auth-trucking-service:8080
+          predicates:
+            - Path=/api/orders/**
+
+        # simple-auth: drivers
+        - id: simple-auth-drivers
+          uri: http://simple-auth-trucking-service:8080
+          predicates:
+            - Path=/api/drivers/**
+
+        # simple-auth: trucks
+        - id: simple-auth-trucks
+          uri: http://simple-auth-trucking-service:8080
+          predicates:
+            - Path=/api/trucks/**
+
+        # simple-auth: trailers
+        - id: simple-auth-trailers
+          uri: http://simple-auth-trucking-service:8080
+          predicates:
+            - Path=/api/trailers/**
+
+        # simple-auth: fleet-assignments
+        - id: simple-auth-fleet
+          uri: http://simple-auth-trucking-service:8080
+          predicates:
+            - Path=/api/fleet-assignments/**
+
+        # simple-auth: calculate
+        - id: simple-auth-calculate
+          uri: http://simple-auth-trucking-service:8080
+          predicates:
+            - Path=/api/calculate/**
+
+        # simple-auth: users
+        - id: simple-auth-users
+          uri: http://simple-auth-trucking-service:8080
+          predicates:
+            - Path=/api/users/**
+
+        # simple-auth-trucking-service (упрощённая авторизация)
+        - id: simple-auth-trucking-service
+          uri: http://simple-auth-trucking-service:8080
+          predicates:
+            - Path=/api/simple-auth/**
+
+        # daily-status-update-service
+        - id: daily-status-update-service
+          uri: http://daily-status-update-service:8080
+          predicates:
+            - Path=/api/daily-status/**
+
+        # match-service
+        - id: match-service
+          uri: http://match-service:8080
+          predicates:
+            - Path=/api/match/**
+  main:
+    web-application-type: reactive
+server:
+  port: 8080
+
+jwt:
+  secret: ${JWT_SECRET}
