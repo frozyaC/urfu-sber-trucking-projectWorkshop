@@ -138,7 +138,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: apppassword
       WIREMOCK_BASE_URL: http://wiremock:8080
     ports:
-      - "8081:8081"
+      - "8083:8080"
     networks:
       - app-network
     healthcheck:
