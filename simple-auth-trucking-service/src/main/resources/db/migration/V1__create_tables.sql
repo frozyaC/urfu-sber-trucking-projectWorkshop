@@ -61,7 +61,7 @@ CREATE TABLE orders (
                         deliveryDate VARCHAR(10) NOT NULL,
                         deliveryTime VARCHAR(5),
                         transportationCost INT NOT NULL,
-                        status VARCHAR(50) NOT NULL DEFAULT 'Создан',
+                        status VARCHAR(50) NOT NULL DEFAULT 'Ожидает',
                         cargoType VARCHAR(255) NOT NULL,
                         specialRequirements VARCHAR(1000),
                         length VARCHAR(20) NOT NULL,

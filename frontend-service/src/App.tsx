@@ -302,7 +302,7 @@ export default function App() {
         height: newOrder.height,
         externalOrderNumber: newOrder.externalOrderNumber,
         id: String(orderNumber),
-        status: 'Создан',
+        status: 'Ожидает',
         assignedDriverId: null
       };
       newOrders.push(order);
@@ -385,7 +385,7 @@ export default function App() {
    */
   const assignDriverToOrder = (orderId: string, driverId: string | null) => {
     setOrders(orders.map(order => 
-      order.id === orderId ? { ...order, assignedDriverId: driverId, status: driverId ? 'На погрузке' : 'Создан' } : order
+      order.id === orderId ? { ...order, assignedDriverId: driverId, status: driverId ? 'Назначен' : 'Ожидает' } : order
     ));
   };
 
