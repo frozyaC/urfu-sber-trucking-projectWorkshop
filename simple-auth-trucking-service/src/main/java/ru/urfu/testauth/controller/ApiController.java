@@ -12,7 +12,6 @@ import ru.urfu.testauth.service.OrderService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -469,26 +468,13 @@ public class ApiController {
     // ==================== FLEET ASSIGNMENTS CRUD ====================
     @GetMapping("/fleet-assignments")
     public ResponseEntity<?> getAllFleetAssignments() {
-        // Enrich assignments with driver/truck/trailer details so фронт получает связанные объекты
-        List<FleetAssignment> assignments = fleetAssignmentRepository.findAll();
-        List<Map<String, Object>> enriched = new ArrayList<>();
-
-        for (FleetAssignment a : assignments) {
-            Map<String, Object> item = new HashMap<>();
-            item.put("id", a.getId());
-            item.put("driverId", a.getDriverId());
-            item.put("truckId", a.getTruckId());
-            item.put("trailerId", a.getTrailerId());
-            item.put("assignedDate", a.getAssignedDate());
-
-            driverRepository.findById(a.getDriverId()).ifPresent(d -> item.put("driver", d));
-            truckRepository.findById(a.getTruckId()).ifPresent(t -> item.put("truck", t));
-            trailerRepository.findById(a.getTrailerId()).ifPresent(tr -> item.put("trailer", tr));
-
-            enriched.add(item);
+        try {
+            List<FleetAssignment> assignments = fleetAssignmentRepository.findAll();
+            return ResponseEntity.ok(Map.of("assignments", assignments));
+        } catch (Exception e) {
+            log.error("Ошибка при получении связей автопарка", e);
+            return ResponseEntity.internalServerError().body(Map.of("message", "Не удалось получить связи автопарка"));
         }
-
-        return ResponseEntity.ok(Map.of("assignments", enriched));
     }
 
     @GetMapping("/fleet-assignments/{id}")

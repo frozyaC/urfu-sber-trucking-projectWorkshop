@@ -220,7 +220,7 @@ export function LogisticianDashboard({
   const handleRefreshStatuses = async () => {
     setIsRefreshing(true);
     try {
-      const response = await fetch('http://localhost:8084/api/status', {
+      const response = await fetch('/api/status', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

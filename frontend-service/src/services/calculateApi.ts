@@ -16,7 +16,8 @@ export interface CalculateResult {
   error?: string;
 }
 
-const BASE_URL = 'http://localhost:8081';
+// Используем тот же origin (gateway проксирует /api/calculate на backend)
+const BASE_URL = '';
 
 export async function fetchCalculatedDrivers(
   orderLatitude?: number,
