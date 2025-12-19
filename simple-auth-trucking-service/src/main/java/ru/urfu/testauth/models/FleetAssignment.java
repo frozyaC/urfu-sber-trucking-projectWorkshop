@@ -1,5 +1,6 @@
 package ru.urfu.testauth.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,14 +30,17 @@ public class FleetAssignment {
     @Column(name = "assignedDate", nullable = false)
     private String assignedDate;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "driverId", insertable = false, updatable = false)
     private Driver driver;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "truckId", insertable = false, updatable = false)
     private Truck truck;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trailerId", insertable = false, updatable = false)
     private Trailer trailer;
